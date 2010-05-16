@@ -1,7 +1,8 @@
 <?php
 require_once dirname(__FILE__) . '/../lib/t.php';
 
-$id = 'tell-k'; //your buzzurl_id is here ex) http://buzzurl.jp/user/[buzzurl_id]
+$id = 'tell-k'; //your buzzurl_id is here 
+                //ex) http://buzzurl.jp/user/[youre buzzurl_id]
 
 $t = new lime_test(16, new lime_output_color());
 

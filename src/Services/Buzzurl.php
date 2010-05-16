@@ -1,6 +1,6 @@
 <?php
 /**
- * Services_Buzzurl 
+ * BuzzurlのAPIを扱うためのライブラリ 
  * 
  * @category   Services
  * @package    Buzzurl
