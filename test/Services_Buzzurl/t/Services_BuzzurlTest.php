@@ -1,13 +1,21 @@
 <?php
+/**
+ * unit test for Services_Buzzurl  
+ * 
+ * @author     tell-k <ffk2005@gmail.com> 
+ * @since      PHP5.2
+ * @version    $Id$
+ */
 require_once dirname(__FILE__) . '/../lib/t.php';
 
-$id = 'tell-k'; //your buzzurl_id is here 
+$id = 'tell-k'; //set your buzzurl_id
                 //ex) http://buzzurl.jp/user/[youre buzzurl_id]
 
 $t = new lime_test(16, new lime_output_color());
 
 require_once 'Services/Buzzurl.php';
 
+$t->diag('getInstance');
 $api = Services_Buzzurl::getInstance();
 $t->ok($api instanceof Services_Buzzurl, 'create instance is ok');
 
