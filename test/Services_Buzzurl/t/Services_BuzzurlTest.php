@@ -19,11 +19,57 @@ $t->diag('getInstance');
 $api = Services_Buzzurl::getInstance();
 $t->ok($api instanceof Services_Buzzurl, 'create instance is ok');
 
+$t->diag('setVersion');
+$validCase = array('v1');
+foreach ($validCase as $case) {
+    try {
+        $api->setVersion($case);
+        $t->pass('set version is ok');
+    } catch (Exception $e) {
+        $t->fail('set version not ok');
+    }
+}
+$errCase = array(null, 'hoge');
+foreach ($errCase as $case) {
+    try {
+        $api->setVersion($case);
+        $t->fail('set version exception test not ok');
+    } catch (InvalidArgumentException $e) {
+        $t->pass('set version exception test is ok');
+    }
+}
+
+$t->diag('setFormat');
+$validCase = array('array', 'json');
+foreach ($validCase as $case) {
+    try {
+        $api->setFormat($case);
+        $t->pass('set format is ok');
+    } catch (Exception $e) {
+        $t->fail('set format not ok');
+    }
+}
+$errCase = array(null, 'hoge');
+foreach ($errCase as $case) {
+    try {
+        $api->setFormat($case);
+        $t->fail('set format exception test not ok');
+    } catch (InvalidArgumentException $e) {
+        $t->pass('set foramat exception test is ok');
+    }
+}
+
 $t->diag('getAirticles');
 $api->setFormat('array');
 $t->ok(is_array($api->getArticles($id)), 'get articles is ok');
 $api->setFormat('json');
 $t->ok(is_string($api->getArticles($id, null)), 'get articles(json) is ok');
+try {
+    $api->getArticles(null);
+    $t->fail('get articles exception test not ok');
+} catch (InvalidArgumentException $e) {
+    $t->pass('get articles exception test is ok');
+}
 
 //please set search keywords
 $keywords = 'php';
@@ -37,12 +83,24 @@ $api->setFormat('array');
 $t->ok(is_array($api->getReaders($id)), 'get readers is ok');
 $api->setFormat('json');
 $t->ok(is_string($api->getReaders($id)), 'get readers(json) is ok');
+try {
+    $api->getReaders(null);
+    $t->fail('get readers exception test not ok');
+} catch (InvalidArgumentException $e) {
+    $t->pass('get readers exception test is ok');
+}
 
 $t->diag('getFavaites');
 $api->setFormat('array');
 $t->ok(is_array($api->getFavarites($id)), 'get favorites is ok');
 $api->setFormat('json');
 $t->ok(is_string($api->getFavarites($id)), 'get favorites(json) is ok');
+try {
+    $api->getFavarites(null);
+    $t->fail('get favorites exception test not ok');
+} catch (InvalidArgumentException $e) {
+    $t->pass('get favorites exception test is ok');
+}
 
 $t->diag('getPostsInfo');
 $url = 'http://ecnavi.jp/';
@@ -50,6 +108,12 @@ $api->setFormat('array');
 $t->ok(is_array($api->getPostsInfo($url)), 'get posts info is ok');
 $api->setFormat('json');
 $t->ok(is_string($api->getPostsInfo($url)), 'get posts(json) info is ok');
+try {
+    $api->getPostsInfo(null);
+    $t->fail('get posts info exception test not ok');
+} catch (InvalidArgumentException $e) {
+    $t->pass('get posts info exception test is ok');
+}
 
 $t->diag('getCounter');
 $url = 'http://ecnavi.jp/';
@@ -63,6 +127,13 @@ $api->setFormat('array');
 $t->ok(is_array($api->getCounter($url)), 'get counter by url array is ok');
 $api->setFormat('json');
 $t->ok(is_string($api->getCounter($url)), 'get counter by url array(json) is ok');
+
+try {
+    $api->getCounter(null);
+    $t->fail('get counter exception test not ok');
+} catch (InvalidArgumentException $e) {
+    $t->pass('get counter exception test is ok');
+}
 
 $t->diag('getCounterImgUrl');
 $url = 'http://ecnavi.jp/';
