@@ -397,26 +397,26 @@ class Services_Buzzurl
     }
 
     //}}}
-    // {{{ doPost() 
-
-    /**
-     * POSTリクエスト
-     * 
-     * @param  string $url 
-     * @param  array  $postData
-     * @access protected
-     * @return string レスポンスボディ
-     */
-    private function doPost($url, $postData = null) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        //curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
-        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-        $result = curl_exec($ch);
-        curl_close($ch);
-        return $result;
-    }
-
-    //}}}
+//    // {{{ doPost() 
+//
+//    /**
+//     * POSTリクエスト
+//     * 
+//     * @param  string $url 
+//     * @param  array  $postData
+//     * @access protected
+//     * @return string レスポンスボディ
+//     */
+//    private function doPost($url, $postData = null) {
+//        $ch = curl_init();
+//        curl_setopt($ch, CURLOPT_URL, $url);
+//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+//        //curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
+//        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+//        $result = curl_exec($ch);
+//        curl_close($ch);
+//        return $result;
+//    }
+//
+//    //}}}
 }
