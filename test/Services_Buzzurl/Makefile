@@ -1,2 +1,2 @@
 test_all: 
-	php ./lib/test_all.php
+	php ./test_all.php
