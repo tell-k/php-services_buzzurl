@@ -10,7 +10,27 @@
  */
 
 /**
- * Services_Buzzurl 
+ * BuzzurlのAPIを扱うためのライブラリ 
+ *
+ * Brief example of use:
+ * <code>
+ * <?php
+ *
+ * $id = 'tell-k' //<= your buzzurl id
+ *
+ * $api = Services_Buzzurl::getInstance();
+ * $result = $api->getReaders($id);
+ *
+ * foreach($result as $user)  {
+ *      print $user . "<br />\n";
+ * }
+ *
+ * $api->setFormat('json');
+ * $result = $api->getReaders($id);
+ *
+ * print $result . "<br />\n"; //print json data
+ *
+ * </code>
  * 
  * @category   Services
  * @package    Buzzurl
