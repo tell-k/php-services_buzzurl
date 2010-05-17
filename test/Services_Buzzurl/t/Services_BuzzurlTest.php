@@ -11,7 +11,7 @@ require_once dirname(__FILE__) . '/../lib/t.php';
 $id = 'tell-k'; //set your buzzurl_id
                 //ex) http://buzzurl.jp/user/[youre buzzurl_id]
 
-$t = new lime_test(16, new lime_output_color());
+$t = new lime_test(48, new lime_output_color());
 
 require_once 'Services/Buzzurl.php';
 
@@ -78,6 +78,41 @@ $t->ok(is_array($api->getArticles($id, 'php')), 'get articles by keywords is ok'
 $api->setFormat('json');
 $t->ok(is_string($api->getArticles($id, 'php')), 'get articles by keywords(json) is ok');
 
+$t->diag('getRecentAirticles');
+$api->setFormat('array');
+$t->ok(is_array($api->getRecentArticles()), 'get recent articles is ok');
+$t->ok(is_array($api->getRecentArticles(null, null, null)), 'get recent articles is ok');
+$t->ok(is_array($api->getRecentArticles(1)), 'get recent articles is ok');
+$t->ok(is_array($api->getRecentArticles(1, 1)), 'get recent articles is ok');
+$t->ok(is_array($api->getRecentArticles(1, 1, 1)), 'get recent articles is ok');
+$t->is(count($api->getRecentArticles(10)), 10, 'get recent articles count is ok');
+
+$api->setFormat('json');
+$t->ok(is_string($api->getRecentArticles()), 'get recent articles(json) is ok');
+$t->ok(is_string($api->getRecentArticles(null, null, null)), 'get recent articles(json) is ok');
+$t->ok(is_string($api->getRecentArticles(1)), 'get recent articles(json) is ok');
+$t->ok(is_string($api->getRecentArticles(1, 1)), 'get recent articles(json) is ok');
+$t->ok(is_string($api->getRecentArticles(1, 1, 1)), 'get recent articles(json) is ok');
+
+$errCase = array(
+        array('num' => -1, 'of' => -1, 'threshold' => -1),
+        array('num' => 1, 'of' => -1, 'threshold' => -1),
+        array('num' => -1, 'of' => 1, 'threshold' => -1),
+        array('num' => -1, 'of' => -1, 'threshold' => 1),
+        array('num' => 'hoge', 'of' => 1, 'threshold' => 1),
+        array('num' => 1.1, 'of' => 1, 'threshold' => 1),
+        array('num' => '01', 'of' => 1, 'threshold' => 1),
+        array('num' => '1a', 'of' => 1, 'threshold' => 1),
+        );
+foreach ($errCase as $v) {
+    try {
+        $api->getRecentArticles($v['num'], $v['of'], $v['threshold']);
+        $t->fail('get recent articles exception test not ok');
+    } catch (InvalidArgumentException $e) {
+        $t->pass('get recent articles exception test is ok');
+    }
+}
+
 $t->diag('getReaders');
 $api->setFormat('array');
 $t->ok(is_array($api->getReaders($id)), 'get readers is ok');
@@ -136,5 +171,12 @@ try {
 }
 
 $t->diag('getCounterImgUrl');
-$url = 'http://ecnavi.jp/';
-$t->is($api->getCounterImgUrl($url), 'http://api.buzzurl.jp/api/counter/v1/image/?url=http%3A%2F%2Fecnavi.jp%2F',  'get counter is ok');
+$url = 'http://buzzurl.jp/';
+$expected = 'http://api.buzzurl.jp/api/counter/v1/image/?url=http%3A%2F%2Fbuzzurl.jp%2F';
+$t->is($api->getCounterImgUrl($url), $expected, 'get counter is ok');
+try {
+    $api->getCounterImgUrl(null);
+    $t->fail('get counter image url exception test not ok');
+} catch (InvalidArgumentException $e) {
+    $t->pass('get counter image url exception test is ok');
+}

@@ -6,6 +6,7 @@
  * @package    Buzzurl
  * @author     tell-k <ffk2005@gmail.com> 
  * @since      PHP5.2
+ * @link       http://labs.ecnavi.jp/developer/buzzurl/api/
  * @version    $Id$
  */
 
@@ -36,6 +37,7 @@
  * @package    Buzzurl
  * @author     tell-k <ffk2005@gmail.com> 
  * @since      PHP5.2
+ * @link       http://labs.ecnavi.jp/developer/buzzurl/api/
  * @version    $Id$
  */
 class Services_Buzzurl 
@@ -97,7 +99,6 @@ class Services_Buzzurl
      * @return void
      */
     public function setVersion($version) {
-
         if (!$version || !in_array($version, $this->versions)) {
             $err = '[' . __CLASS__ . '] argument error';
             throw new InvalidArgumentException($err);
@@ -116,7 +117,6 @@ class Services_Buzzurl
      * @return void
      */
     public function setFormat($format) {
-
         if (!$format || !in_array($format, $this->formats)) {
             $err = '[' . __CLASS__ . '] argument error';
             throw new InvalidArgumentException($err);
@@ -136,13 +136,11 @@ class Services_Buzzurl
      * @return void
      */
     protected function setResponseType($type) {
-
         if (!$type || !in_array($type, $this->responseTypes)) {
             $err = '[' . __CLASS__ . '] argument error';
             throw new InvalidArgumentException($err);
         }
         $this->responseType = $type;
-
     }
 
     // }}}
@@ -168,7 +166,7 @@ class Services_Buzzurl
     /**
      * ユーザーの最近のエントリー一覧取得
      *
-     * キーワードでの絞り込み
+     * キーワードでの絞り込みが可能
      * 
      * @link   http://labs.ecnavi.jp/developer/2007/01/jsonapi.html
      * @link   http://labs.ecnavi.jp/developer/2007/03/jsonapi_5.html
@@ -188,6 +186,45 @@ class Services_Buzzurl
                             : $userId;
 
         $result = $this->doGet($this->getApiUrl('articles', $param));
+        return $this->formatResult($result);
+    }
+
+    //}}}
+    // {{{ getRecentArticles() 
+
+    /**
+     * 新着エントリー一覧取得
+     *
+     * @link   http://labs.ecnavi.jp/developer/2007/01/jsonapi_4.html
+     * @param  int $num       取得件数
+     * @param  int $of        ページ数
+     * @param  int $threshold ブックマークユーザー数閾値
+     * @access public
+     * @return mixed エントリー一覧
+     */
+    public function getRecentArticles($num = null, $of = null, $threshold = null) {
+
+        if (
+            ($num && !preg_match('/^[1-9][0-9]*$/', $num))
+            || ($of  && !preg_match('/^[1-9][0-9]*$/', $of)) 
+            || ($threshold && !preg_match('/^[1-9][0-9]*$/', $threshold))
+        ) {
+            $err = '[' . __CLASS__ . '] argument error';
+            throw new InvalidArgumentException($err);
+        }
+
+        $params = array('num', 'of', 'threshold'); 
+        $tmp = array();
+        foreach ($params as $v) {
+            if (!$$v) continue;
+        
+            if ($v === 'of' || $v === 'threshold') $$v++;
+            
+            $tmp[] = $v . '=' . urlencode($$v); 
+        }
+        $param = (count($tmp) > 0) ? '?' . implode('&', $tmp) : null;
+
+        $result = $this->doGet($this->getApiUrl('articles/recent', $param));
         return $this->formatResult($result);
     }
 
