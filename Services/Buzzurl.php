@@ -25,7 +25,6 @@
  * foreach($result as $user)  {
  *      print $user . "<br />\n";
  * }
- *
  * $api->setFormat('json');
  * $result = $api->getReaders($id);
  *
