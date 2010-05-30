@@ -15,6 +15,7 @@
  *
  * Brief example of use:
  * <code>
+ *
  * <?php
  * $id = 'tell-k' //<= your buzzurl id
  *
