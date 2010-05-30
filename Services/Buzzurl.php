@@ -16,7 +16,6 @@
  * Brief example of use:
  * <code>
  * <?php
- *
  * $id = 'tell-k' //<= your buzzurl id
  *
  * $api = Services_Buzzurl::getInstance();
