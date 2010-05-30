@@ -12,7 +12,6 @@
 
 /**
  * BuzzurlのAPIを扱うためのライブラリ 
- *
  * Brief example of use:
  * <code>
  *
