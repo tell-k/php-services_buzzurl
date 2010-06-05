@@ -11,7 +11,7 @@ require_once dirname(__FILE__) . '/../lib/t.php';
 $id = 'tell-k'; //set your buzzurl_id
                 //ex) http://buzzurl.jp/user/[youre buzzurl_id]
 
-$t = new lime_test(48, new lime_output_color());
+$t = new lime_test(50, new lime_output_color());
 
 require_once 'Services/Buzzurl.php';
 
@@ -85,6 +85,8 @@ $t->ok(is_array($api->getRecentArticles(null, null, null)), 'get recent articles
 $t->ok(is_array($api->getRecentArticles(1)), 'get recent articles is ok');
 $t->ok(is_array($api->getRecentArticles(1, 1)), 'get recent articles is ok');
 $t->ok(is_array($api->getRecentArticles(1, 1, 1)), 'get recent articles is ok');
+$t->ok(is_array($api->getRecentArticles(2, 2, 2)), 'get recent articles is ok');
+$t->ok(is_array($api->getRecentArticles(2, 3, 3)), 'get recent articles is ok');
 $t->is(count($api->getRecentArticles(10)), 10, 'get recent articles count is ok');
 
 $api->setFormat('json');

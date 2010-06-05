@@ -215,8 +215,8 @@ class Services_Buzzurl
         $tmp = array();
         foreach ($params as $v) {
             if (!$$v) continue;
-        
-            if ($v === 'of' || $v === 'threshold') $$v++;
+
+            if ($v === 'of' || $v === 'threshold') $$v--;
             
             $tmp[] = $v . '=' . urlencode($$v); 
         }
