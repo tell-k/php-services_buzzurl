@@ -29,6 +29,19 @@
  *
  * print $result . "<br />\n"; //print json data
  *
+ * //add bookmark
+ * $api = Services_Buzzurl::getInstance();
+ * $email  = ''; //<= your buzzurl login id(email)  
+ * $passwd = ''; //<= your buzzurl password
+ * $args   = array('url' => 'http://buzzurl.jp');
+ * $result = $api->add($email, $passwd, $args);
+ * 
+ * if ($result) {
+ *     print 'add bookmark success' . "<br />\n";
+ * } else {
+ *     print 'add bookmark failed' . "<br />\n" ;
+ * }
+ *
  * </code>
  * 
  * @category   Services
@@ -53,6 +66,13 @@ class Services_Buzzurl
 
     private $commands = array('counter', 'readers', 'favorites', 'ariticles');
 
+    private $addParams = array('url', 'title', 'comment', 'keyword', 'reply', 'access');
+
+    private $replys   = array('0', '1');
+    private $accesses = array('anonymous', 'private');
+
+    const MAX_KEYWORD_NUM = 8;
+    const TIMEOUT  = 5;//5 seconds
     const API_URL  = 'http://api.buzzurl.jp/api/%s/%s/%s/%s';
     const ADD_URL  = 'https://buzzurl.jp/posts/add/%s/';
 
@@ -157,8 +177,96 @@ class Services_Buzzurl
     }
 
     // }}}
+    // {{{ makePostData() 
+    
+    /**
+     * 投稿APIのリクエストパラメータ生成(POST)
+     * 
+     * @param  array $args 
+     * @access public
+     * @return post parameter
+     */
+    public function makePostData($args) {
+
+        //filter process
+        $tmp  = array();
+        $tmp2 = array();
+        foreach($this->addParams as $name) {
+            if (array_key_exists($name, $args)) {
+                $tmp[$name] = $args[$name];
+            }
+        }
+        
+        //keyword
+        if (array_key_exists('keyword', $tmp) 
+            && is_array($tmp['keyword'])) 
+        {
+           array_splice($tmp['keyword'], self::MAX_KEYWORD_NUM);//default 8 words
+           $tmp['keyword'] = implode('&keyword=' , $tmp['keyword']);
+        }
+        
+        //reply
+        if (array_key_exists('reply', $tmp) 
+            && !in_array($tmp['reply'], $this->replys)) 
+        {
+            unset($tmp['reply']);
+        }
+
+        //access
+        if (array_key_exists('access', $tmp) 
+            && !in_array($tmp['access'], $this->accesses)) 
+        {
+            unset($tmp['access']);
+        }
+
+        foreach($tmp as $k => $v) {
+            $tmp2[] = $k . '=' . $v;
+        }
+        return implode('&', $tmp2);
+    }
+    
+    // }}}
 
 //api command
+    // {{{ add() 
+    
+    /**
+     * 記事投稿(ブクマ)
+     * 
+     * ログインID(Email)とパスワードが必要になります。
+     * 
+     * $args['url']     = 'http://hogehoge.com' //必須 
+     * $args['title']   = 'title'               //任意
+     * $args['comment'] = 'comment'             //任意
+     * $args['keyword'] = 'keyword'             //任意 (string => 'keyword' or array => array('hoge1', 'hoge2'))
+     * $args['reply']   = '0'                   //任意 (0 or 1)
+     * $args['access']  = 'private'             //任意 (private or anonymous)
+     * 
+     * @link   http://labs.ecnavi.jp/developer/2007/03/api_2.html
+     * @param  string $email 
+     * @param  string $passwd 
+     * @param  array  $args 
+     * @access public
+     * @return boolean 投稿成功 true or 投稿失敗 false
+     */
+    public function add($email, $passwd, $args) {
+
+        if (!is_array($args) 
+            || !array_key_exists('url', $args)
+            || !$email 
+            || !$passwd)
+        {
+            $err = '[' . __CLASS__ . '] argument error';
+            throw new InvalidArgumentException($err);
+        }
+
+        $postData = $this->makePostData($args);
+        $result   = $this->doPost(sprintf(self::ADD_URL, $this->version), $email, $passwd, $postData);
+        $json     = (array) json_decode($result);
+        return (is_array($json) && array_key_exists('status', $json) && $json['status'] === 'success') ? true : false;
+    }
+
+    // }}}
     // {{{ getArticles() 
 
     /**
@@ -387,8 +495,33 @@ class Services_Buzzurl
     protected function doGet($url) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        //curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, self::TIMEOUT);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        return $result;
+    }
+
+    // }}}
+    // {{{ doPost() 
+
+    /**
+     * POSTリクエスト
+     * 
+     * @param  string $url 
+     * @param  array  $postData
+     * @access protected
+     * @return string レスポンスボディ
+     */
+    protected function doPost($url, $email, $passwd,  $postData) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, self::TIMEOUT);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData); 
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERPWD, $email . ':' . $passwd);
+        curl_setopt($ch, CURLOPT_URL,  $url);
         curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
         $result = curl_exec($ch);
         curl_close($ch);
@@ -396,26 +529,4 @@ class Services_Buzzurl
     }
 
     //}}}
-//    // {{{ doPost() 
-//
-//    /**
-//     * POSTリクエスト
-//     * 
-//     * @param  string $url 
-//     * @param  array  $postData
-//     * @access protected
-//     * @return string レスポンスボディ
-//     */
-//    private function doPost($url, $postData = null) {
-//        $ch = curl_init();
-//        curl_setopt($ch, CURLOPT_URL, $url);
-//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-//        //curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
-//        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-//        $result = curl_exec($ch);
-//        curl_close($ch);
-//        return $result;
-//    }
-//
-//    //}}}
 }

@@ -11,7 +11,7 @@ require_once dirname(__FILE__) . '/../lib/t.php';
 $id = 'tell-k'; //set your buzzurl_id
                 //ex) http://buzzurl.jp/user/[youre buzzurl_id]
 
-$t = new lime_test(50, new lime_output_color());
+$t = new lime_test(68, new lime_output_color());
 
 require_once 'Services/Buzzurl.php';
 
@@ -182,3 +182,120 @@ try {
 } catch (InvalidArgumentException $e) {
     $t->pass('get counter image url exception test is ok');
 }
+
+$t->diag('makePostData');
+$case = array(
+        array(
+            'args'     => array('url' => 'http://test.co.jp'),
+            'expected' => 'url=http://test.co.jp',
+            ),
+        array(
+            'args'     => array('url' => 'http://test.co.jp', 'keyword' => 'test'),
+            'expected' => 'url=http://test.co.jp&keyword=test',
+            ),
+        array(
+            'args'     => array('url' => 'http://test.co.jp', 'keyword' => array('test', 'test2')),
+            'expected' => 'url=http://test.co.jp&keyword=test&keyword=test2',
+            ),
+        array(
+            'args'     => array('hoge' => 'http://test.co.jp', 'keyword' => array('test', 'test2')),
+            'expected' => 'keyword=test&keyword=test2',
+            ),
+        array(
+            'args'     => array('keyword' => array('test', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9')),
+            'expected' => 'keyword=test&keyword=test2&keyword=test3&keyword=test4&keyword=test5&keyword=test6&keyword=test7&keyword=test8',
+            ),
+        array(
+            'args'     => array('reply' => '1'),
+            'expected' => 'reply=1',
+            ),
+        array(
+            'args'     => array('reply' => '0'),
+            'expected' => 'reply=0',
+            ),
+        array(
+            'args'     => array('reply' => '-1'),
+            'expected' => '',
+            ),
+        array(
+            'args'     => array('reply' => '0.1'),
+            'expected' => '',
+            ),
+        array(
+            'args'     => array('reply' => '1.1'),
+            'expected' => '',
+            ),
+        array(
+            'args'     => array('reply' => 'hoge'),
+            'expected' => '',
+            ),
+        array(
+            'args'     => array('access' => 'anonymous'),
+            'expected' => 'access=anonymous',
+            ),
+        array(
+            'args'     => array('access' => 'private'),
+            'expected' => 'access=private',
+            ),
+        array(
+            'args'     => array('access' => 'unknowon'),
+            'expected' => '',
+            ),
+        );
+
+foreach($case as $v) {
+    $result = $api->makePostData($v['args']);
+    $t->is($result, $v['expected'], 'make post data test is ok');
+}
+
+//$t->diag('add');
+//
+// 実際に投稿のテストをする時 addのテストのコメント合うとは外して行ってください。
+//
+//$email  = ''; //<= your buzzurl login id(email) 
+//$passwd = ''; //<= your buzzurl password
+//
+//$case = array(
+//        array('url' => 'http://buzzurl.jp'),
+//        array('url' => 'http://buzzurl.jp', 'title' => 'Buzzurl', 'comment' => 'buzzurl 投稿テスト', 'keyword' => array('SBM', 'social'), 'reply' => '0', 'access' => 'anonymous'),
+//        array('url' => 'http://buzzurl.jp', 'title' => 'Buzzurl', 'comment' => 'buzzurl 投稿テスト', 'keyword' => 'tagtest', 'reply' => '1', 'access' => 'private'),
+//        );
+//foreach($case as $args) {
+//    $result = $api->add($email, $passwd, $args);
+//    $t->is($result, true, 'add test is ok');
+//}
+
+
+$t->diag('add - exception test');
+try {
+    $args = null;
+    $api->add($email, $passwd, $args);
+    $t->fail('add exception test is fail');
+} catch (Exception $e) {
+    $t->pass('add exception test is ok');
+}
+
+try {
+    $args = array();
+    $api->add($email, $passwd, $args);
+    $t->fail('add exception test is fail');
+} catch (Exception $e) {
+    $t->pass('add exception test is ok');
+}
+
+try {
+    $args = array('url' => 'http://buzzurl.jp');
+    $api->add(null, $passwd, $args);
+    $t->fail('add exception test is fail');
+} catch (Exception $e) {
+    $t->pass('add exception test is ok');
+}
+
+try {
+    $args = array('url' => 'http://buzzurl.jp');
+    $api->add($email, null, $args);
+    $t->fail('add exception test is fail');
+} catch (Exception $e) {
+    $t->pass('add exception test is ok');
+}
+
