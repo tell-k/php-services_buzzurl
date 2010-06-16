@@ -265,7 +265,6 @@ foreach($case as $v) {
 //    $t->is($result, true, 'add test is ok');
 //}
 
-
 $t->diag('add - exception test');
 try {
     $args = null;

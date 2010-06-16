@@ -56,10 +56,10 @@ class Services_Buzzurl
     static private $instance;
 
     private $version = 'v1';
-    private $versions  = array('v1');
+    private $versions = array('v1');
 
-    private $format  = 'array';
-    private $formats  = array('array', 'json');
+    private $format = 'array';
+    private $formats = array('array', 'json');
 
     private $responseType = 'json';
     private $responseTypes = array('json', 'image');
@@ -72,9 +72,9 @@ class Services_Buzzurl
     private $accesses = array('anonymous', 'private');
 
     const MAX_KEYWORD_NUM = 8;
-    const TIMEOUT  = 5;//5 seconds
-    const API_URL  = 'http://api.buzzurl.jp/api/%s/%s/%s/%s';
-    const ADD_URL  = 'https://buzzurl.jp/posts/add/%s/';
+    const TIMEOUT = 5; //5 seconds
+    const API_URL = 'http://api.buzzurl.jp/api/%s/%s/%s/%s';
+    const ADD_URL = 'https://buzzurl.jp/posts/add/%s/';
 
     // {{{ __construct() 
 
@@ -184,7 +184,7 @@ class Services_Buzzurl
      * 
      * @param  array $args 
      * @access public
-     * @return post parameter
+     * @return string POSTパラメータ
      */
     public function makePostData($args) {
 
